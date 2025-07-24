@@ -18,8 +18,10 @@ model User {
   id              String   @id @default(cuid())
   username        String   @unique
   email           String   @unique
+  firstName       String
+  lastName        String
   password        String   // hashed password
-  role            Role     @default(EMPLOYEE)
+  role            Role     @default(employee)
   department      Department?
   suboffice       Suboffice?
   isRoleConfirmed Boolean  @default(false)
@@ -27,7 +29,7 @@ model User {
   idImageUrl      String?  // URL
 
   // Prisma handles timestamps automatically if you want
-  createdAt       DateTime @default(now())
+  createdAt       DateTime @default(now())  
   updatedAt       DateTime @updatedAt
 
   // Relations
@@ -40,7 +42,7 @@ model User {
 model RoleRequestRecord {
   id             String   @id @default(cuid())
   requestedRole  Role
-  status         RoleRequestStatus
+  status         RoleRequestStatus @default(pending)
   processedAt    DateTime @default(now())
 
   // Relations
@@ -54,32 +56,33 @@ model RoleRequestRecord {
 }
 
 enum Role {
-  WAREHOUSE_ADMIN
-  WAREHOUSE_STAFF
-  MANAGER
-  EMPLOYEE
-  ENGINEERING
-  OPERATIONS_MAINTENANCE
-  BUDGET_ANALYST
-  SUB_OFFICE
-  FINANCE
-  AUDIT
+  warehouse_admin
+  warehouse_staff
+  manager
+  employee
+  engineering
+  operations_maintenance
+  budget_analyst
+  sub_office
+  finance
+  audit
 }
 
 enum Department {
-  ENGINEERING
-  OPERATIONS_MAINTENANCE
-  FINANCE
-  ADMIN
+  engineering
+  operations_maintenance
+  finance
+  admin
 }
 
 enum Suboffice {
-  SUB_OFFICE_A
-  SUB_OFFICE_B
-  SUB_OFFICE_C
+  sub_office_a
+  sub_office_b
+  sub_office_c
 }
 
 enum RoleRequestStatus {
-  APPROVED
-  REJECTED
+  approved
+  rejected
+  pending
 }

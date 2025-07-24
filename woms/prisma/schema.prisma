@@ -13,3 +13,73 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id              String   @id @default(cuid())
+  username        String   @unique
+  email           String   @unique
+  password        String   // hashed password
+  role            Role     @default(EMPLOYEE)
+  department      Department?
+  suboffice       Suboffice?
+  isRoleConfirmed Boolean  @default(false)
+  signature       String?  // URL
+  idImageUrl      String?  // URL
+
+  // Prisma handles timestamps automatically if you want
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  roleRequests    RoleRequestRecord[]
+  processedRoles  RoleRequestRecord[] @relation("ProcessedBy")
+
+  @@map("users")
+}
+
+model RoleRequestRecord {
+  id             String   @id @default(cuid())
+  requestedRole  Role
+  status         RoleRequestStatus
+  processedAt    DateTime @default(now())
+
+  // Relations
+  user           User     @relation(fields: [userId], references: [id])
+  userId         String
+
+  processedBy    User?    @relation("ProcessedBy", fields: [processedById], references: [id])
+  processedById  String?
+
+  @@map("role_request_records")
+}
+
+enum Role {
+  WAREHOUSE_ADMIN
+  WAREHOUSE_STAFF
+  MANAGER
+  EMPLOYEE
+  ENGINEERING
+  OPERATIONS_MAINTENANCE
+  BUDGET_ANALYST
+  SUB_OFFICE
+  FINANCE
+  AUDIT
+}
+
+enum Department {
+  ENGINEERING
+  OPERATIONS_MAINTENANCE
+  FINANCE
+  ADMIN
+}
+
+enum Suboffice {
+  SUB_OFFICE_A
+  SUB_OFFICE_B
+  SUB_OFFICE_C
+}
+
+enum RoleRequestStatus {
+  APPROVED
+  REJECTED
+}

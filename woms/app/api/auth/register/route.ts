@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { Role } from "@/app/generated/prisma";
 
 export async function POST(req: Request) {
   try {
@@ -44,14 +45,18 @@ export async function POST(req: Request) {
       },
     });
 
-    // 📝 Create role request record
-    await prisma.roleRequestRecord.create({
-      data: {
-        userId: newUser.id,
-        requestedRole: role,
-        status: "pending", // assuming your enum includes 'pending'
-      },
-    });
+    try {
+      await prisma.roleRequestRecord.create({
+        data: {
+          userId: newUser.id,
+          requestedRole: role as Role,
+          status: "pending",
+        },
+      });
+    } catch (err) {
+      console.error("Role request creation failed:", err);
+    }
+
 
     return NextResponse.json({ message: "User registered and pending role approval." }, { status: 201 });
   } catch (err) {

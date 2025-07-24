@@ -42,7 +42,7 @@ model User {
 model RoleRequestRecord {
   id             String   @id @default(cuid())
   requestedRole  Role
-  status         RoleRequestStatus
+  status         RoleRequestStatus @default(pending)
   processedAt    DateTime @default(now())
 
   // Relations
@@ -84,4 +84,5 @@ enum Suboffice {
 enum RoleRequestStatus {
   approved
   rejected
+  pending
 }

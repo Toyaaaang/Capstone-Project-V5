@@ -61,19 +61,13 @@ export function RegisterForm({
   const uploadIdImage = async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
-    formData.append(
-      "upload_preset",
-      process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET as string
-    );
-    const res = await fetch(
-      process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_URL as string,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
+    formData.append("upload_preset", "user_id_upload");
+    const res = await fetch(process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_URL as string, {
+      method: "POST",
+      body: formData,
+    });
     const data = await res.json();
-    return data.secure_url; // This is the image URL
+    return data.secure_url;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,8 +99,8 @@ export function RegisterForm({
       role: formData.role,
       firstName: formData.firstName,
       lastName: formData.lastName,
-      department: formData.department || null,
-      suboffice: formData.suboffice || null,
+      department: formData.department || undefined,
+      suboffice: formData.suboffice || undefined,
     };
 
     try {
@@ -118,12 +112,7 @@ export function RegisterForm({
       }
 
       // Register user
-      await register({
-        ...payload,
-        idImageUrl: idImageUrl,
-        department: payload.department ?? undefined,
-        suboffice: payload.suboffice ?? undefined,
-      });
+      await register({ ...payload, idImageUrl: idImageUrl });
       toast.success("Registration successful! Please wait for admin verification.");
       router.push("/login");
     } catch (error: any) {

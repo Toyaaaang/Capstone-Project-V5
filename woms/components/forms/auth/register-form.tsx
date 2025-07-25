@@ -383,7 +383,7 @@ export function RegisterForm({
                 </div>
               </div>
               <div className="mt-4 text-center text-sm text-white">
-                Already have an account? <a href="login" className="underline underline-offset-4">Sign in</a>
+                Already have an account? <a href="/auth/login" className="underline underline-offset-4">Sign in</a>
               </div>
             </form>
           </CardContent>

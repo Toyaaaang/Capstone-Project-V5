@@ -1,13 +1,28 @@
-// lib/auth.ts
-import { NextAuthOptions, User as NextAuthUser } from "next-auth";
+import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
+// 🔧 Extend the types for session and user
 declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+      email?: string | null;
+      name?: string | null;
+      image?: string | null;
+      role?: string;
+    };
+  }
+
   interface User {
+    id: string;
     role?: string;
+  }
+
+  interface JWT {
     id?: string;
+    role?: string;
   }
 }
 
@@ -52,25 +67,27 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
+  jwt: {
+  secret: process.env.NEXTAUTH_SECRET,
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = user.role;
         token.id = user.id;
+        token.role = user.role;
       }
       return token;
     },
     async session({ session, token }) {
-      if (!session.user) {
-        session.user = {};
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
       }
-      (session.user as { id?: string; role?: string }).id = token.id as string;
-      (session.user as { id?: string; role?: string }).role = token.role as string;
       return session;
     },
   },
   pages: {
-    signIn: "/login", // your login page path
+    signIn: "/login",
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

@@ -39,8 +39,8 @@ export default function useLogin() {
 
     const role = session?.user?.role || "employee";
     const roleRoutes: Record<string, string> = {
-      warehouse_admin: "/warehouse_admin/dashboard",
-      warehouse_staff: "/warehouse_staff/dashboard",
+      warehouse_admin: "/admin/dashboard",
+      warehouse_staff: "/staff/dashboard",
       budget_analyst: "/budget/dashboard",
       engineering: "/engineering/dashboard",
       operations_maintenance: "/operations_maintenance/dashboard",

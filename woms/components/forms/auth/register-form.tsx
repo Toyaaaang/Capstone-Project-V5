@@ -114,7 +114,7 @@ export function RegisterForm({
       // Register user
       await register({ ...payload, idImageUrl: idImageUrl });
       toast.success("Registration successful! Please wait for admin verification.");
-      router.push("/login");
+      router.push("/auth/login");
     } catch (error: any) {
       setUploadingImage(false); // Ensure it's reset on error
       const detail = error?.response?.data;

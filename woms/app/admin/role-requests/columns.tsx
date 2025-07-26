@@ -120,23 +120,30 @@ export const columns: ColumnDef<RoleRequest>[] = [
   {
     id: "actions",
     header: "Actions",
-    cell: ({ row }) => {
-      
-      const { approveRoleRequest, rejectRoleRequest } = useRoleRequests();
+    cell: ({ row, table }) => {
+      const { approveRoleRequest, rejectRoleRequest, refreshData } = useRoleRequests();
+
+      const handleApprove = async () => {
+        await approveRoleRequest(row.original.id);
+      };
+
+      const handleReject = async () => {
+        await rejectRoleRequest(row.original.id);
+      };
 
       return (
         <div className="flex space-x-2">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => approveRoleRequest(row.original.id)}
+            onClick={handleApprove}
           >
             Approve
           </Button>
           <Button
             variant="destructive"
             size="sm"
-            onClick={() => rejectRoleRequest(row.original.id)}
+            onClick={handleReject}
           >
             Reject
           </Button>

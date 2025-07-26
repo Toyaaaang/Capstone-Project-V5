@@ -28,7 +28,7 @@ export default function RoleRequestsPage() {
         page={page}
         setPage={setPage}
         totalCount={totalCount}
-        meta={{ refreshData: () => fetchRoleRequests(page) }}        
+        refreshData={() => fetchRoleRequests(page)}        
       />
     </div>
   );

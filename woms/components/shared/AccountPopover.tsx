@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import ESignatureRecorder from "@/components/shared/accounts/Esignaturerecorder";
 import EditNameDialog from "@/components/shared/accounts/EditAccount";
 import { signOut } from "next-auth/react";
+import { toast } from "sonner"
 
 export default function AccountPopover() {
   const [isSignatureDialogOpen, setSignatureDialogOpen] = useState(false);
@@ -45,6 +46,7 @@ export default function AccountPopover() {
 
   const handleLogout = async () => {
     await signOut({ callbackUrl: "/auth/login" });
+    toast.success("Logging out please wait...");
   };
 
   useEffect(() => {

@@ -132,10 +132,12 @@ enum RoleRequestStatus {
 
 model Notification {
   id          String   @id @default(cuid())
-  user        User     @relation(fields: [userId], references: [id])
-  userId      String
+  userId      String?  
+  user        User?    @relation(fields: [userId], references: [id])
+  role        Role?   
   title       String
   body        String
+  link        String?
   read        Boolean  @default(false)
   createdAt   DateTime @default(now())
 }

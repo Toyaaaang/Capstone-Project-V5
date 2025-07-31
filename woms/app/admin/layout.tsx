@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { ModeToggle } from "@/components/themes/ModeToggle";
+import NotificationDropdown from "@/components/shared/accounts/SidebarNotifications";
+import { useNotificationStream } from "@/hooks/notification/useNotificationStream"
 
 export default function WarehouseAdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -34,6 +36,8 @@ export default function WarehouseAdminLayout({ children }: { children: React.Rea
       );
     }
   }, [pathname]);
+
+  useNotificationStream()
 
   return (
     // <RoleLayout allowedRole="warehouse_admin">
@@ -80,7 +84,7 @@ export default function WarehouseAdminLayout({ children }: { children: React.Rea
                 </div>
                 <div className="flex items-center gap-4">
                   <ModeToggle />
-                  {/* <NotificationDropdown /> */}
+                  <NotificationDropdown />
                   <AccountPopover />
                 </div>
               </header>

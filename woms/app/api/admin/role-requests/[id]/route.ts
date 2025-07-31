@@ -3,6 +3,14 @@ import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { sendNotification } from "@/lib/notify";
+
+// Utility function
+function formatRole(role: string) {
+  return role
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
 export async function PATCH(
   req: NextRequest,
@@ -49,6 +57,17 @@ export async function PATCH(
       },
     }),
   ]);
+
+  // Send notification to the user
+  await sendNotification({
+    userId: roleRequest.userId,
+    title: isApproved
+      ? "Role Request Approved"
+      : "Role Request Rejected",
+    body: isApproved
+      ? `Your request for the role "${formatRole(roleRequest.requestedRole)}" has been approved.`
+      : `Your request for the role "${formatRole(roleRequest.requestedRole)}" has been rejected.`,
+  });
 
   return NextResponse.json({ success: true });
 }

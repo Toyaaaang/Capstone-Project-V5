@@ -77,6 +77,7 @@ model User {
   processedRoles  RoleRequestRecord[] @relation("ProcessedBy")
   accounts        Account[]
   sessions        Session[]
+  notifications   Notification[]
   
   @@map("users")
 }
@@ -129,3 +130,14 @@ enum RoleRequestStatus {
   pending
 }
 
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String?  
+  user        User?    @relation(fields: [userId], references: [id])
+  role        Role?   
+  title       String
+  body        String
+  link        String?
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}

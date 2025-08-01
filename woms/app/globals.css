@@ -68,7 +68,7 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
+  --sidebar: oklch(0.905 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
@@ -76,6 +76,21 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --color-desktop: hsl(var(--chart-1));
+  --color-mobile: hsl(var(--chart-2));
+  --department-engineering: oklch(39.3% 0.095 152.535);
+  --department-finance: oklch(52.7% 0.154 150.069);
+  --department-operations_maintenance: oklch(72.3% 0.219 149.579);
+  --category-wiring: #004602;
+  --category-poles: #590069;
+  --category-metering: #ae6800;
+  --category-transformers: #003c6e;
+  --category-hardware: #491300;
+  --category-safety: #c70d00;
+  --category-tools: #001797;
+  --category-office_supply: #607d8b;
+  --category-uncategorized: #9e9e9e;
+
 }
 
 .dark {
@@ -102,7 +117,7 @@
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
+  --sidebar: oklch(0.230 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
@@ -110,6 +125,27 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --color-desktop: hsl(var(--chart-1)); /* You can use different values for dark mode if you want */
+  --color-mobile: hsl(var(--chart-2));
+  --department-engineering: oklch(60% 0.15 152.535); /* Example: lighter for dark mode */
+  --department-finance: oklch(70% 0.18 150.069);
+  --department-operations_maintenance: oklch(85% 0.22 149.579);
+  --category-wiring: #4caf50;
+  --category-poles: #9c27b0;
+  --category-metering: #ff9800;
+  --category-transformers: #2196f3;
+  --category-hardware: #0d5585;
+  --category-safety: #f44336;
+  --category-tools: #3f51b5;
+  --category-office_supply: #607d8b;
+  --category-uncategorized: #9e9e9e;
+}
+
+/* globals.css */
+.bg-warehouse {
+  background-image: url('/bg-warehouse.jpg');
+  background-size: cover;
+  background-position: center;
 }
 
 @layer base {

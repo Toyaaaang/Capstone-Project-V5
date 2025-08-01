@@ -18,6 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { ModeToggle } from "@/components/themes/ModeToggle";
 import NotificationDropdown from "@/components/shared/accounts/SidebarNotifications";
 import { useNotificationStream } from "@/hooks/notification/useNotificationStream"
+import RoleLayout from "@/components/shared/guards/RoleLayout";
 
 export default function WarehouseAdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -40,7 +41,7 @@ export default function WarehouseAdminLayout({ children }: { children: React.Rea
   useNotificationStream()
 
   return (
-    // <RoleLayout allowedRole="warehouse_admin">
+    <RoleLayout allowedRoles={["warehouse_admin"]}>
       <SidebarProvider>
         <AppSidebar menuData={warehouseAdminMenu} />
         <SidebarInset>
@@ -93,6 +94,6 @@ export default function WarehouseAdminLayout({ children }: { children: React.Rea
           </div>
         </SidebarInset>
       </SidebarProvider>
-    // </RoleLayout>
+    </RoleLayout>
   );
 }

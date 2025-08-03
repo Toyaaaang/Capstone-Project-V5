@@ -24,6 +24,7 @@ export const warehouseAdminMenu = [
     title: "Accountability Management",
     items: [
       { title: "Accountabilities", url: "/admin/accountability-management" },
+      { title: "Audit Logs", url: "/admin/audit-logs" },
     ],
   },
   {

@@ -31,7 +31,8 @@ export default function SidebarNotifications() {
     return null;
   }
 
-  const unreadCount = notifications.filter((n: { read: any; }) => !n.read).length;
+  const notificationsArray = Array.isArray(notifications) ? notifications : [];
+  const unreadCount = notificationsArray.filter((n: { read: any; }) => !n.read).length;
 
   return (
     <DropdownMenu>
@@ -54,13 +55,13 @@ export default function SidebarNotifications() {
           <DropdownMenuItem disabled className="text-red-500">
             Error: {error}
           </DropdownMenuItem>
-        ) : notifications.length === 0 ? (
+        ) : notificationsArray.length === 0 ? (
           <DropdownMenuItem disabled className="text-gray-500">
             No notifications
           </DropdownMenuItem>
         ) : (
           <>
-            {notifications.map((notification: { id: Key | null | undefined; read: any; link: string; title: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; body: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; createdAt: string | number | Date; }) => (
+            {notificationsArray.map((notification: { id: Key | null | undefined; read: any; link: string; title: any; body: any; createdAt: any; }) => (
               <DropdownMenuItem
                 key={notification.id}
                 onSelect={(e) => e.preventDefault()}
@@ -108,35 +109,40 @@ export default function SidebarNotifications() {
               </DropdownMenuItem>
             ))}
 
-            <DropdownMenuItem
-              onSelect={(e) => e.preventDefault()}
-              className="flex justify-center mt-2"
-            >
-              <Button
-                variant="ghost"
-                className="text-green-600 w-full"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={markAllAsRead}
-              >
-                <CheckCircle2 className="w-full h-4 mr-1" />
-                Mark All as Read
-              </Button>
-            </DropdownMenuItem>
+            {/* Only show these buttons if there are notifications */}
+            {notificationsArray.length > 0 && (
+              <>
+                <DropdownMenuItem
+                  onSelect={(e) => e.preventDefault()}
+                  className="flex justify-center mt-2"
+                >
+                  <Button
+                    variant="ghost"
+                    className="text-green-600 w-full"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={markAllAsRead}
+                  >
+                    <CheckCircle2 className="w-full h-4 mr-1" />
+                    Mark All as Read
+                  </Button>
+                </DropdownMenuItem>
 
-            <DropdownMenuItem
-              onSelect={(e) => e.preventDefault()}
-              className="flex justify-center"
-            >
-              <Button
-                variant="ghost"
-                className="text-red-500 w-full"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={clearAllNotifications}
-              >
-                <Trash2 className="w-full h-4 mr-1" />
-                Clear All
-              </Button>
-            </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={(e) => e.preventDefault()}
+                  className="flex justify-center"
+                >
+                  <Button
+                    variant="ghost"
+                    className="text-red-500 w-full"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={clearAllNotifications}
+                  >
+                    <Trash2 className="w-full h-4 mr-1" />
+                    Clear All
+                  </Button>
+                </DropdownMenuItem>
+              </>
+            )}
           </>
         )}
       </DropdownMenuContent>

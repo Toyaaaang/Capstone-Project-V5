@@ -2,6 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { logAudit } from "@/lib/audit-log";
 
 // 🔧 Extend the types for session and user
 declare module "next-auth" {
@@ -90,4 +91,13 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
   secret: process.env.NEXTAUTH_SECRET,
+  events: {
+    async signIn({ user }) {
+      await logAudit(
+        "login",
+        `User logged in with email: ${user.email}`,
+        user.id
+      );
+    },
+  },
 };

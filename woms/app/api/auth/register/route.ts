@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { Role } from "@/app/generated/prisma";
 import { sendNotification } from "@/lib/notify";
+import { logAudit } from "@/lib/audit-log";
 
 export async function POST(req: Request) {
   try {
@@ -58,12 +59,19 @@ export async function POST(req: Request) {
       console.error("Role request creation failed:", err);
     }
 
+    // Log audit entry for registration
+    await logAudit(
+      "register",
+      `User registered with email: ${newUser.email}`,
+      newUser.id
+    );
+
     await sendNotification({
-    role: "warehouse_admin",
-    title: "New Role Request",
-    body: `${newUser.firstName} ${newUser.lastName} has registered and is awaiting role confirmation.`,
-    link: "/admin/role-requests",
-  });
+      role: "warehouse_admin",
+      title: "New Role Request",
+      body: `${newUser.firstName} ${newUser.lastName} has registered and is awaiting role confirmation.`,
+      link: "/admin/role-requests",
+    });
 
     return NextResponse.json({ message: "User registered and pending role approval." }, { status: 201 });
   } catch (err) {

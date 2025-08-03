@@ -5,7 +5,7 @@ import AccountPopover from "@/components/shared/AccountPopover";
 import { useEffect, useState } from "react";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/shared/app-sidebar";
-import { warehouseAdminMenu } from "@/components/sidebar-contents/admin";
+import { Menu } from "@/components/sidebar-contents/budget";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -20,12 +20,12 @@ import NotificationDropdown from "@/components/shared/accounts/SidebarNotificati
 import { useNotificationStream } from "@/hooks/notification/useNotificationStream"
 import RoleLayout from "@/components/shared/guards/RoleLayout";
 
-export default function WarehouseAdminLayout({ children }: { children: React.ReactNode }) {
+export default function BudgetLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [pageName, setPageName] = useState("Overview");
 
   useEffect(() => {
-    if (pathname === "/admin/dashboard") {
+    if (pathname === "/budget/dashboard") {
       setPageName("Overview");
     } else {
       // Capitalize each word for better display
@@ -41,9 +41,9 @@ export default function WarehouseAdminLayout({ children }: { children: React.Rea
   useNotificationStream()
 
   return (
-    <RoleLayout allowedRoles={["warehouse_admin"]}>
+    <RoleLayout allowedRoles={["budget_analyst"]}>
       <SidebarProvider>
-        <AppSidebar menuData={warehouseAdminMenu} />
+        <AppSidebar menuData={Menu} />
         <SidebarInset>
           <div
             className={`
@@ -70,8 +70,8 @@ export default function WarehouseAdminLayout({ children }: { children: React.Rea
                   <Breadcrumb className="select-none">
                     <BreadcrumbList>
                       <BreadcrumbItem className="hidden md:block">
-                        <BreadcrumbLink href="/admin/dashboard">
-                          Warehouse Admin
+                        <BreadcrumbLink href="/budget/dashboard">
+                          Budget Analyst
                         </BreadcrumbLink>
                       </BreadcrumbItem>
                       <BreadcrumbSeparator className="hidden md:block" />

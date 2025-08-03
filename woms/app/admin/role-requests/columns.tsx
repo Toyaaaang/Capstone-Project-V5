@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { ImageIcon } from "lucide-react";
 import { useRoleRequests } from "@/hooks/admin/useRoleRequests";
+import React from "react";
 
 type RoleRequest = {
   id: string;
@@ -87,7 +89,7 @@ export const columns: ColumnDef<RoleRequest>[] = [
             <DialogHeader>
               <DialogTitle>User Details</DialogTitle>
               <DialogDescription>
-                Here's more info about <strong>{user.firstName} {user.lastName}</strong>
+                Here&apos;s more info about <strong>{user.firstName} {user.lastName}</strong>
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-2 text-sm">
@@ -120,15 +122,22 @@ export const columns: ColumnDef<RoleRequest>[] = [
   {
     id: "actions",
     header: "Actions",
-    cell: ({ row, table }) => {
-      const { approveRoleRequest, rejectRoleRequest, refreshData } = useRoleRequests();
+    cell: ({ row }) => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const { approveRoleRequest, rejectRoleRequest } = useRoleRequests();
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const [loading, setLoading] = React.useState<null | "approve" | "reject">(null);
 
       const handleApprove = async () => {
+        setLoading("approve");
         await approveRoleRequest(row.original.id);
+        setLoading(null);
       };
 
       const handleReject = async () => {
+        setLoading("reject");
         await rejectRoleRequest(row.original.id);
+        setLoading(null);
       };
 
       return (
@@ -137,15 +146,17 @@ export const columns: ColumnDef<RoleRequest>[] = [
             variant="outline"
             size="sm"
             onClick={handleApprove}
+            disabled={!!loading}
           >
-            Approve
+            {loading === "approve" ? "Approving..." : "Approve"}
           </Button>
           <Button
             variant="destructive"
             size="sm"
             onClick={handleReject}
+            disabled={!!loading}
           >
-            Reject
+            {loading === "reject" ? "Rejecting..." : "Reject"}
           </Button>
         </div>
       );

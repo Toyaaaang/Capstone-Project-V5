@@ -2,23 +2,23 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import { toast } from "sonner";
 
-const NotificationContext = createContext<any>(null)
+const NotificationContext = createContext<unknown>(null)
 
 export const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
-  const [notifications, setNotifications] = useState<any[]>([])
+  const [notifications, setNotifications] = useState<unknown[]>([]);
 
   // Fetch notifications from DB on mount
   useEffect(() => {
     fetch("/api/notifications")
       .then((res) => res.json())
-      .then((data) => setNotifications(data))
-      .catch(() => setNotifications([]))
-  }, [])
+      .then((data) => setNotifications(Array.isArray(data) ? data : [])) // <-- ensure array
+      .catch(() => setNotifications([]));
+  }, []);
 
   const addNotification = (notification: any) => {
-<<<<<<< Updated upstream
+
     setNotifications((prev) => [notification, ...prev])
-=======
+
     setNotifications((prev) => Array.isArray(prev) ? [notification, ...prev] : [notification]);
     toast(notification.title, {
       description: notification.body,
@@ -29,7 +29,6 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
           }
         : undefined,
     });
->>>>>>> Stashed changes
   }
 
   const markAsRead = async (id: string) => {

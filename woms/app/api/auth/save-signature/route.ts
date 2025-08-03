@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { v2 as cloudinary } from "cloudinary";
+import { logAudit } from "@/lib/audit-log";
 
 cloudinary.config({
   cloudinary_url: process.env.CLOUDINARY_URL!,
@@ -49,6 +50,13 @@ export async function POST(req: Request) {
       where: { id: session.user.id },
       data: { signature: uploadResult.secure_url },
     });
+
+    // 📝 Log audit entry for e-signature change/add
+    await logAudit(
+      "update signature",
+      `User ${updatedUser.username} updated their e-signature.`,
+      updatedUser.id
+    );
 
     return NextResponse.json({ url: uploadResult.secure_url });
   } catch (error) {

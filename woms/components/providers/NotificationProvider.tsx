@@ -1,5 +1,6 @@
 "use client"
 import { createContext, useContext, useEffect, useState } from "react"
+import { toast } from "sonner";
 
 const NotificationContext = createContext<unknown>(null)
 
@@ -14,8 +15,20 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
       .catch(() => setNotifications([]));
   }, []);
 
-  const addNotification = (notification: unknown) => {
-    setNotifications((prev) => Array.isArray(prev) ? [notification, ...prev] : [notification]); // <-- ensure array
+  const addNotification = (notification: any) => {
+
+    setNotifications((prev) => [notification, ...prev])
+
+    setNotifications((prev) => Array.isArray(prev) ? [notification, ...prev] : [notification]);
+    toast(notification.title, {
+      description: notification.body,
+      action: notification.link
+        ? {
+            label: "View",
+            onClick: () => window.location.href = notification.link,
+          }
+        : undefined,
+    });
   }
 
   const markAsRead = async (id: string) => {

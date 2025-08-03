@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { sendNotification } from "@/lib/notify";
+import { logAudit } from "@/lib/audit-log";
 
 // Utility function
 function formatRole(role: string) {
@@ -68,6 +69,13 @@ export async function PATCH(
       ? `Your request for the role "${formatRole(roleRequest.requestedRole)}" has been approved.`
       : `Your request for the role "${formatRole(roleRequest.requestedRole)}" has been rejected.`,
   });
+
+  // Log audit entry
+  await logAudit(
+    isApproved ? "approve role" : "reject role",
+    `Role request for "${formatRole(roleRequest.requestedRole)}" was ${isApproved ? "approved" : "rejected"} by ${session.user.email}`,
+    session.user.id
+  );
 
   return NextResponse.json({ success: true });
 }

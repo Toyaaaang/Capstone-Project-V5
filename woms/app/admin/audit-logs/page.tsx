@@ -52,8 +52,6 @@ export default function AuditLogsPage() {
           </div>
         }
       />
-      {loading && <div className="mt-4 text-blue-500">Loading...</div>}
-      {error && <div className="mt-4 text-red-500">Error: {error}</div>}
     </div>
   );
 }

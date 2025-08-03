@@ -1,21 +1,21 @@
 "use client"
 import { createContext, useContext, useEffect, useState } from "react"
 
-const NotificationContext = createContext<any>(null)
+const NotificationContext = createContext<unknown>(null)
 
 export const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
-  const [notifications, setNotifications] = useState<any[]>([])
+  const [notifications, setNotifications] = useState<unknown[]>([]);
 
   // Fetch notifications from DB on mount
   useEffect(() => {
     fetch("/api/notifications")
       .then((res) => res.json())
-      .then((data) => setNotifications(data))
-      .catch(() => setNotifications([]))
-  }, [])
+      .then((data) => setNotifications(Array.isArray(data) ? data : [])) // <-- ensure array
+      .catch(() => setNotifications([]));
+  }, []);
 
-  const addNotification = (notification: any) => {
-    setNotifications((prev) => [notification, ...prev])
+  const addNotification = (notification: unknown) => {
+    setNotifications((prev) => Array.isArray(prev) ? [notification, ...prev] : [notification]); // <-- ensure array
   }
 
   const markAsRead = async (id: string) => {

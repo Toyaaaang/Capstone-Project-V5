@@ -9,6 +9,7 @@ type ApprovalHistory = {
   status: string;
   processed_by_username: string;
   processed_at: string;
+  idImageUrl?: string;
 };
 
 export function useRoleHistory() {
@@ -33,6 +34,7 @@ export function useRoleHistory() {
         status: item.status,
         processed_by_username: item.processed_by_username,
         processed_at: item.processed_at,
+        idImageUrl: item.idImageUrl, // <-- add this line
       }));
 
       setData(mapped);

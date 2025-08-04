@@ -32,6 +32,7 @@ export async function GET(req: NextRequest) {
           user: {
             select: {
               username: true,
+              idImageUrl: true,
             },
           },
           processedBy: {
@@ -52,6 +53,7 @@ export async function GET(req: NextRequest) {
       status: record.status,
       processed_by_username: record.processedBy?.username || "Unknown",
       processed_at: record.processedAt,
+      idImageUrl: record.user.idImageUrl, 
     }));
 
     return NextResponse.json({

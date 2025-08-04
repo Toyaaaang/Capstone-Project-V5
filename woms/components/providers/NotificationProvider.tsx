@@ -15,7 +15,6 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
       .catch(() => setNotifications([]));
   }, []);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const addNotification = (notification: any) => {
     setNotifications((prev) => {
       // Check for duplicate by id

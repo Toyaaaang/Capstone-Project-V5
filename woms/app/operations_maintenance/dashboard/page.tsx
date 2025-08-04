@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { ChartAreaInteractive } from "@/components/charts/charts";
 import { SectionCards } from "@/components/charts/SectionCards";
 
-export default function BudgetOverview() {
+export default function OperationsOverview() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -13,7 +13,7 @@ export default function BudgetOverview() {
     if (status === "loading") return;
 
     // If no session or wrong role, redirect
-    if (!session?.user || session.user.role !== "budget_analyst") {
+    if (!session?.user || session.user.role !== "operations_maintenance") {
       router.replace("/auth/unauthorized");
     }
   }, [status, session, router]);
@@ -24,11 +24,11 @@ export default function BudgetOverview() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Budget Analyst Overview</h1>
+      <h1 className="text-2xl font-bold mb-4">Operations & Maintenance Overview</h1>
       <div className="flex flex-1 flex-col">
         <div className="@container/main flex flex-1 flex-col gap-2">
           <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-            <SectionCards role="budget_analyst" />
+            <SectionCards role="employee" />
             <div className="px-4 lg:px-6">
               <ChartAreaInteractive />
             </div>

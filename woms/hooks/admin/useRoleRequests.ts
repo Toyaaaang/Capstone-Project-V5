@@ -38,6 +38,7 @@ export function useRoleRequests() {
 
       const rawData = Array.isArray(json) ? json : json.data ?? [];
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mapped = rawData.map((item: any) => ({
         id: item.id,
         requestedRole: item.requestedRole,

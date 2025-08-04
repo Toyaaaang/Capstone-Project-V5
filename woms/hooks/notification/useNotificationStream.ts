@@ -21,7 +21,7 @@ export const useNotificationStream = () => {
       console.error("SSE error:", err)
       eventSource.close()
     }
-
+    
     return () => {
       eventSource.close()
     }

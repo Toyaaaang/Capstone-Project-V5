@@ -5,6 +5,7 @@ import DataTable from "@/components/Tables/DataTable";
 import { columns } from "./columns";
 import { Input } from "@/components/ui/input";
 import { useCallback } from "react";
+import TableLoader from "@/components/Loaders/TableLoader";
 
 export default function AuditLogsPage() {
   const {
@@ -28,7 +29,8 @@ export default function AuditLogsPage() {
     },
     [setSearch, setPage]
   );
-
+  if (loading) return <TableLoader />;
+  if (error) return <div>Error: {error}</div>;
   return (
     <div className="max-w-full mx-auto">
       <DataTable

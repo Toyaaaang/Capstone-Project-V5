@@ -91,16 +91,19 @@ export const columns: ColumnDef<ApprovalHistory>[] = [
                 Here&apos;s more info about <strong>{capitalize(user.user_username)}</strong>
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-2 text-sm">
+            <div className="space-y-2 text-sm" style={{ maxHeight: 350, overflowY: "auto" }}>
               <div><strong>Role:</strong> {capitalize(user.requested_role)}</div>
               <div><strong>Status:</strong> {capitalize(user.status)}</div>
               <div><strong>Processed By:</strong> {capitalize(user.processed_by_username)}</div>
               {user.idImageUrl ? (
-                <img
-                  src={user.idImageUrl}
-                  alt="ID Image"
-                  className="w-full rounded-lg border mt-3"
-                />
+                <div className="flex justify-center items-center">
+                  <img
+                    src={user.idImageUrl}
+                    alt="ID Image"
+                    className="max-h-100 w-auto rounded-lg border mt-3 object-contain"
+                    style={{ maxWidth: "100%" }}
+                  />
+                </div>
               ) : (
                 <div className="text-muted-foreground">No ID image uploaded</div>
               )}

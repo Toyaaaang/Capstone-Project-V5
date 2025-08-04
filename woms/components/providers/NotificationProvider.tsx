@@ -15,11 +15,14 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
       .catch(() => setNotifications([]));
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const addNotification = (notification: any) => {
+    setNotifications((prev) => {
+      // Check for duplicate by id
+      if (prev.some((n) => n.id === notification.id)) return prev;
+      return [notification, ...prev];
+    });
 
-    setNotifications((prev) => [notification, ...prev])
-
-    setNotifications((prev) => Array.isArray(prev) ? [notification, ...prev] : [notification]);
     toast(notification.title, {
       description: notification.body,
       action: notification.link

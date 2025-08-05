@@ -13,6 +13,7 @@ import {
 import { ImageIcon } from "lucide-react";
 import { useRoleRequests } from "@/hooks/admin/useRoleRequests";
 import React from "react";
+import { ConfirmActionDialog } from "@/components/alert-dialog/AlertDialog";
 
 type RoleRequest = {
   id: string;
@@ -142,22 +143,40 @@ export const columns: ColumnDef<RoleRequest>[] = [
 
       return (
         <div className="flex space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleApprove}
-            disabled={!!loading}
-          >
-            {loading === "approve" ? "Approving..." : "Approve"}
-          </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={handleReject}
-            disabled={!!loading}
-          >
-            {loading === "reject" ? "Rejecting..." : "Reject"}
-          </Button>
+          <ConfirmActionDialog
+            trigger={
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={!!loading}
+              >
+                {loading === "approve" ? "Approving..." : "Approve"}
+              </Button>
+            }
+            title="Approve Role Request"
+            description="Are you sure you want to approve this role request?"
+            confirmLabel="Approve"
+            cancelLabel="Cancel"
+            onConfirm={handleApprove}
+            loading={loading === "approve"}
+          />
+          <ConfirmActionDialog
+            trigger={
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={!!loading}
+              >
+                {loading === "reject" ? "Rejecting..." : "Reject"}
+              </Button>
+            }
+            title="Reject Role Request"
+            description="Are you sure you want to reject this role request? This action cannot be undone."
+            confirmLabel="Reject"
+            cancelLabel="Cancel"
+            onConfirm={handleReject}
+            loading={loading === "reject"}
+          />
         </div>
       );
     },

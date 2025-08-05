@@ -40,30 +40,36 @@ export default function EditNameDialog({
   }, [open]);
 
   const handleSubmit = async () => {
-  setLoading(true);
-  try {
-    const res = await fetch("/api/auth/account", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        first_name: firstName || initialFirstName,
-        last_name: lastName || initialLastName,
-      }),
-    });
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/account", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          first_name: firstName || initialFirstName,
+          last_name: lastName || initialLastName,
+        }),
+      });
 
-    if (!res.ok) throw new Error("Failed");
+      let json;
+      try {
+        json = await res.json();
+      } catch {
+        json = { error: "Invalid JSON response" };
+      }
 
-    toast.success("Name updated successfully");
-    onOpenChange(false);
-    refresh?.();
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed to update name");
-  } finally {
-    setLoading(false);
-  }
-};
+      if (!res.ok) throw new Error(json.error || "Failed");
 
+      toast.success(json.message || "Name updated successfully");
+      onOpenChange(false);
+      refresh?.();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update name");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -85,7 +91,7 @@ export default function EditNameDialog({
         </div>
         <DialogFooter>
           <Button className="w-full" onClick={handleSubmit} disabled={loading}>
-            <Save/>
+            <Save />
             {loading ? "Saving..." : "Save"}
           </Button>
         </DialogFooter>

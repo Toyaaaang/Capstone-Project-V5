@@ -151,3 +151,35 @@ model AuditLog {
   description String
   createdAt   DateTime @default(now())
 }
+
+model Material {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  unit        String
+  category    MaterialCategory @default(uncategorized)
+  description String?
+  visible     Boolean  @default(true)
+  inventory   Inventory[]
+}
+
+model Inventory {
+  id         String    @id @default(cuid())
+  material   Material  @relation(fields: [materialId], references: [id])
+  materialId String
+  quantity   Int?
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([materialId])
+}
+
+enum MaterialCategory {
+  wiring
+  poles
+  metering
+  transformers
+  hardware
+  safety
+  tools
+  office_supply
+  uncategorized
+}

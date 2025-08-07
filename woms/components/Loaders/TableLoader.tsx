@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function TableLoader() {
   return (
-    <div className="p-10 border rounded-md shadow-sm m-4">
+    <div className="p-10 border rounded-md shadow-sm m-4 select-none">
       <h2 className="text-xl font-bold mb-4">
         <Skeleton className="h-6 w-1/4" />
       </h2>

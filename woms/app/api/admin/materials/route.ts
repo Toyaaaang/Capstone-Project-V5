@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { logAudit } from "@/lib/audit-log"; 
 
 // Helper to check admin
 async function isAdmin(req: NextRequest) {
@@ -42,6 +43,13 @@ export async function POST(req: NextRequest) {
   const data = await req.json();
   try {
     const material = await prisma.material.create({ data });
+
+    // Audit log
+    await logAudit(
+      "Create material",
+      `Material "${material.name}" created.`
+    );
+
     return NextResponse.json(material, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: "Failed to create material" }, { status: 400 });

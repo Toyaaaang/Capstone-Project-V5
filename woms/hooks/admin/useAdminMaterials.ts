@@ -6,14 +6,23 @@ export function useAdminMaterials() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("");
   const pageSize = 10; // or whatever default you want
 
   // Fetch all materials
-  const fetchMaterials = async (pageNumber = 1) => {
+  const fetchMaterials = async (pageNumber = 1, searchValue = "", categoryValue = "") => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/materials?page=${pageNumber}&page_size=${pageSize}`, {
+      const params = new URLSearchParams({
+        page: String(pageNumber),
+        page_size: String(pageSize),
+      });
+      if (searchValue) params.append("search", searchValue);
+      if (categoryValue) params.append("category", categoryValue);
+
+      const res = await fetch(`/api/admin/materials?${params.toString()}`, {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Network response was not ok");
@@ -46,9 +55,9 @@ export function useAdminMaterials() {
   };
 
   useEffect(() => {
-    fetchMaterials(page);
+    fetchMaterials(page, search, category);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
+  }, [page, search, category]);
 
   return {
     materials,
@@ -61,5 +70,9 @@ export function useAdminMaterials() {
     setPage,
     totalCount,
     pageSize,
+    search,
+    setSearch,
+    category,
+    setCategory,
   };
 }

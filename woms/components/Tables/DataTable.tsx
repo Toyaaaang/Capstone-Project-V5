@@ -44,7 +44,7 @@ export default function DataTable<TData>({
   setPage,
   totalCount,
   pageSize = 10,
-  filters, // <-- accept custom filters as a prop
+  filters,
 }: DataTableProps<TData>) {
   const totalPages = Math.ceil(totalCount / pageSize);
 
@@ -76,18 +76,22 @@ export default function DataTable<TData>({
   });
 
   return (
-    <div className="p-4 border rounded-md shadow-sm select-none"
-            style={{
-              // border: "1px solid transparent",
-              background: "rgba(0, 17, 252, 0.04)",
-              boxShadow: "0 8px 38px 0 rgba(23,23,23,0.17)",
-              backdropFilter: "blur(18.5px)",
-              WebkitBackdropFilter: "blur(4.5px)",  
-            }}>
-      <h2 className="text-xl font-bold mb-4 p-4">{title}</h2>
-
-      {/* Custom Filters */}
-      {filters && <div className="mb-4">{filters}</div>}
+    <div
+      className="p-4 border rounded-md shadow-sm select-none"
+      style={{
+        background: "rgba(0, 17, 252, 0.04)",
+        boxShadow: "0 8px 38px 0 rgba(23,23,23,0.17)",
+        backdropFilter: "blur(18.5px)",
+        WebkitBackdropFilter: "blur(4.5px)",
+      }}
+    >
+      {/* Title and Filters in a single row, no wrap */}
+      <div className="flex items-center justify-between mb-4 gap-4 flex-nowrap">
+        <h2 className="text-xl font-bold p-4 m-0">{title}</h2>
+        {filters && (
+          <div className="flex items-center gap-2">{filters}</div>
+        )}
+      </div>
 
       {/* Table */}
       <Table>

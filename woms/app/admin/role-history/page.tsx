@@ -1,11 +1,22 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import DataTable from "@/components/Tables/DataTable";
 import TableLoader from "@/components/Loaders/TableLoader";
 import { columns } from "./columns";
-import { useRoleHistory } from "@/hooks/admin/useApprovalHistory"; 
+import { useRoleHistory } from "@/hooks/admin/useApprovalHistory";
+import { SearchAndFilter } from "@/components/ui/SearchAndFilter"; // <-- Import your new component
+
 export default function RoleHistoryPage() {
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
+
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedSearch(search), 400);
+    return () => clearTimeout(handler);
+  }, [search]);
+
   const {
     data,
     loading,
@@ -14,7 +25,7 @@ export default function RoleHistoryPage() {
     setPage,
     totalCount,
     refreshData,
-  } = useRoleHistory(); 
+  } = useRoleHistory({ search: debouncedSearch }); // Pass debounced search
 
   const searchParams = useSearchParams();
 
@@ -30,7 +41,14 @@ export default function RoleHistoryPage() {
         page={page}
         setPage={setPage}
         totalCount={totalCount}
-        refreshData={refreshData} 
+        refreshData={refreshData}
+        filters={
+          <SearchAndFilter
+            searchPlaceholder="Search user, role, status..."
+            searchValue={search}
+            onSearchChange={setSearch}
+          />
+        }
       />
     </div>
   );

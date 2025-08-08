@@ -55,13 +55,7 @@ export function getInventoryColumns({ onEdit, editingId, onChange, onSave, onCan
       accessorKey: "visible",
       header: "Visible",
       cell: ({ row }) =>
-        editingId === row.original.id ? (
-          <input
-            type="checkbox"
-            checked={row.original.material?.visible}
-            onChange={e => onChange(row.original.id, "visible", e.target.checked)}
-          />
-        ) : row.original.material?.visible ? "Yes" : "No",
+        row.original.material?.visible ? "Yes" : "No",
     },
     {
       id: "actions",

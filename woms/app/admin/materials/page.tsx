@@ -6,82 +6,110 @@ import { useAdminMaterials } from "@/hooks/admin/useAdminMaterials";
 import { getMaterialColumns } from "./columns";
 import TableLoader from "@/components/Loaders/TableLoader";
 import AddMaterialDialog from "./AddMaterialDialog";
+import { SearchAndFilter } from "@/components/ui/SearchAndFilter";
 
 export default function AdminMaterialsPage() {
   const {
     materials,
     loading,
-    error,
     updateMaterial,
-    setMaterials,
     page,
     setPage,
     totalCount,
     pageSize,
     fetchMaterials,
+    search,
+    setSearch,
+    category,
+    setCategory,
   } = useAdminMaterials();
+
   const [editingId, setEditingId] = useState<number | null>(null);
   const [localMaterials, setLocalMaterials] = useState<any[]>([]);
 
-  // Sync localMaterials with fetched materials
   React.useEffect(() => {
     setLocalMaterials(materials);
   }, [materials]);
 
-  const handleEdit = (id: number) => setEditingId(id);
-
-  const handleChange = (id: number, field: string, value: any) => {
-    setLocalMaterials(mats =>
-      mats.map(m => (m.id === id ? { ...m, [field]: value } : m))
-    );
-  };
-
-  const handleSave = async (id: number) => {
-    const mat = localMaterials.find(m => m.id === id);
-    if (mat) {
-      await updateMaterial(id, {
-        name: mat.name,
-        unit: mat.unit,
-        category: mat.category,
-        visible: mat.visible,
-      });
-      setEditingId(null);
-    }
-  };
-
-  const handleCancel = () => {
-    setLocalMaterials(materials);
-    setEditingId(null);
-  };
-
   const columns = getMaterialColumns({
-    onEdit: handleEdit,
+    onEdit: (id) => setEditingId(id),
     editingId,
-    onChange: handleChange,
-    onSave: handleSave,
-    onCancel: handleCancel,
+    onChange: (id, field, value) =>
+      setLocalMaterials(mats =>
+        mats.map(m => (m.id === id ? { ...m, [field]: value } : m))
+      ),
+    onSave: async (id) => {
+      const mat = localMaterials.find(m => m.id === id);
+      if (mat) {
+        await updateMaterial(id, {
+          name: mat.name,
+          unit: mat.unit,
+          category: mat.category,
+          visible: mat.visible,
+        });
+        setEditingId(null);
+      }
+    },
+    onCancel: () => {
+      setLocalMaterials(materials);
+      setEditingId(null);
+    },
   });
+
+  // MaterialCategory options from your schema
+  const categoryOptions = [
+    { label: "All", value: "all" },
+    { label: "Wiring", value: "wiring" },
+    { label: "Poles", value: "poles" },
+    { label: "Metering", value: "metering" },
+    { label: "Transformers", value: "transformers" },
+    { label: "Hardware", value: "hardware" },
+    { label: "Safety", value: "safety" },
+    { label: "Tools", value: "tools" },
+    { label: "Office Supply", value: "office_supply" },
+    { label: "Uncategorized", value: "uncategorized" },
+  ];
+
+  // Use "all" as no filter
+  const selectedCategory = category === "all" ? "" : category;
+
+  // Fetch materials when filters change
+  React.useEffect(() => {
+    fetchMaterials(page, search, selectedCategory);
+    // eslint-disable-next-line
+  }, [page, search, category]);
 
   return (
     <div className="p-6">
       {loading ? (
         <TableLoader />
-      ) : error ? (
-        <div className="text-red-500">{error}</div>
       ) : (
-        <>
-          <DataTable
-            title="Materials Management"
-            columns={columns}
-            data={localMaterials}
-            page={page}
-            setPage={setPage}
-            totalCount={totalCount}
-            pageSize={pageSize}
-          />
-          <AddMaterialDialog onMaterialAdded={fetchMaterials} />
-        </>
+        <DataTable
+          title="Materials Management"
+          columns={columns}
+          data={localMaterials}
+          page={page}
+          setPage={setPage}
+          totalCount={totalCount}
+          pageSize={pageSize}
+          filters={
+            <SearchAndFilter
+              searchPlaceholder="Search materials..."
+              searchValue={search}
+              onSearchChange={setSearch}
+              dropdowns={[
+                {
+                  label: "Category",
+                  value: category,
+                  options: categoryOptions,
+                  onChange: setCategory,
+                },
+              ]}
+            />
+          }
+        />
       )}
+      <AddMaterialDialog onMaterialAdded={fetchMaterials} />
     </div>
   );
 }

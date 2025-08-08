@@ -8,6 +8,8 @@ import TableLoader from "@/components/Loaders/TableLoader";
 import AddInventoryDialog from "./AddInventoryDialog";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { SearchAndFilter } from "@/components/ui/SearchAndFilter";
+import { toast } from "sonner";
 
 export default function AdminInventoryPage() {
   const {
@@ -21,22 +23,48 @@ export default function AdminInventoryPage() {
   } = useAdminInventory();
   const [editingId, setEditingId] = useState<number | null>(null);
   const [localInventory, setLocalInventory] = useState<any[]>([]);
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("all");
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
   const router = useRouter();
 
+  // Only update localInventory from inventory when not editing
   React.useEffect(() => {
-    setLocalInventory(inventory);
-  }, [inventory]);
+    if (editingId === null) {
+      setLocalInventory(inventory);
+    }
+  }, [inventory, editingId]);
+
+  // Debounce search
+  React.useEffect(() => {
+    const handler = setTimeout(() => setDebouncedSearch(search), 600);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  // Filtered inventory based on search and category
+  const filteredInventory = React.useMemo(() => {
+    let result = localInventory;
+    if (debouncedSearch) {
+      result = result.filter((item) =>
+        item.material?.name?.toLowerCase().includes(debouncedSearch.toLowerCase())
+      );
+    }
+    if (category !== "all") {
+      result = result.filter((item) => item.material?.category === category);
+    }
+    return result;
+  }, [localInventory, debouncedSearch, category]);
 
   const handleEdit = (id: number) => setEditingId(id);
 
   const handleChange = (id: number, field: string, value: any) => {
-    setLocalInventory(inv =>
-      inv.map(i => (i.id === id ? { ...i, [field]: value } : i))
+    setLocalInventory((inv) =>
+      inv.map((i) => (i.id === id ? { ...i, [field]: value } : i))
     );
   };
 
   const handleSave = async (id: string) => {
-    const item = localInventory.find(i => i.id === id);
+    const item = localInventory.find((i) => i.id === id);
     if (item) {
       // If item.material is an object, use its id; if it's already a string, use as is
       const materialId =
@@ -49,6 +77,7 @@ export default function AdminInventoryPage() {
         quantity: Number(item.quantity),
       });
       setEditingId(null);
+      toast.success("The inventory item was successfully updated.");
     }
   };
 
@@ -76,7 +105,7 @@ export default function AdminInventoryPage() {
         <AddInventoryDialog
           materials={materials}
           onAdd={handleAdd}
-          onSuccess={fetchInventory} 
+          onSuccess={fetchInventory}
         />
         <Button
           variant="outline"
@@ -93,11 +122,18 @@ export default function AdminInventoryPage() {
         <DataTable
           title="Inventory"
           columns={columns}
-          data={localInventory}
+          data={filteredInventory}
           page={1}
           setPage={() => {}}
-          totalCount={localInventory.length}
-          pageSize={localInventory.length}
+          totalCount={filteredInventory.length}
+          pageSize={filteredInventory.length}
+          filters={
+            <SearchAndFilter
+              searchPlaceholder="Search material..."
+              searchValue={search}
+              onSearchChange={setSearch}
+            />
+          }
         />
       )}
     </div>

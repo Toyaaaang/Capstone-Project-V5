@@ -6,24 +6,60 @@ const PAGE_SIZE = 10;
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const page = parseInt(searchParams.get("page") || "1");
+  const search = searchParams.get("search")?.trim() || "";
 
   const skip = (page - 1) * PAGE_SIZE;
+
+  // Build search filter
+  let searchFilter = {};
+  if (search) {
+    // Prepare possible enum matches for requestedRole and status
+    const roleEnums = [
+      "warehouse_admin",
+      "warehouse_staff",
+      "manager",
+      "employee",
+      "engineering",
+      "operations_maintenance",
+      "budget_analyst",
+      "sub_office",
+      "finance",
+      "audit",
+    ];
+    const statusEnums = ["approved", "rejected", "pending"];
+
+    const requestedRoleMatch = roleEnums.find(
+      (role) => role.toLowerCase() === search.toLowerCase()
+    );
+    const statusMatch = statusEnums.find(
+      (status) => status.toLowerCase() === search.toLowerCase()
+    );
+
+    searchFilter = {
+      OR: [
+        { user: { username: { contains: search, mode: "insensitive" } } },
+        { processedBy: { username: { contains: search, mode: "insensitive" } } },
+        ...(requestedRoleMatch
+          ? [{ requestedRole: { equals: requestedRoleMatch } }]
+          : []),
+        ...(statusMatch ? [{ status: { equals: statusMatch } }] : []),
+      ],
+    };
+  }
 
   try {
     const [totalCount, records] = await Promise.all([
       prisma.roleRequestRecord.count({
         where: {
-          status: {
-            in: ["approved", "rejected"],
-          },
+          status: { in: ["approved", "rejected"] },
+          ...searchFilter,
         },
       }),
 
       prisma.roleRequestRecord.findMany({
         where: {
-          status: {
-            in: ["approved", "rejected"],
-          },
+          status: { in: ["approved", "rejected"] },
+          ...searchFilter,
         },
         orderBy: {
           processedAt: "desc",

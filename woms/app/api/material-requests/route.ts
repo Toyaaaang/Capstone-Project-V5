@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
     await sendNotification({
       userId: recipient.id,
       title: "New Material Request",
-      body: `${user.firstName} ${user.lastName} submitted a new material request for evaluation.`,
+      body: `${user.firstName} ${user.lastName} submitted a new material request for evaluation. Reference: ${createdRequest.referenceCode}`,
       link: `/${department}/material-requests/${createdRequest.id}/items`,
     });
   }

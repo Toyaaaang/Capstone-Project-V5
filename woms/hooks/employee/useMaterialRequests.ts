@@ -14,7 +14,7 @@ export function useMaterialRequests() {
         page: pageNumber.toString(),
         page_size: pageSize.toString(),
       }).toString();
-      
+
       const res = await fetch(`/api/material-requests/my-requests?${params}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -22,7 +22,23 @@ export function useMaterialRequests() {
 
       if (!res.ok) throw new Error("Failed to fetch material requests");
       const { results, count } = await res.json();
-      setData(results);
+
+      // Transform to match columns.tsx expectations
+      setData(
+        results.map((req: any) => ({
+          ...req,
+          work_order_no: req.workOrderNo ?? "—",
+          created_at: req.createdAt,
+          items: (req.items || []).map((item: any) => ({
+            ...item,
+            custom_name: item.customName,
+            material: item.material,
+            // Add fallback for name and unit
+            name: item.customName || item.material?.name || "—",
+            unit: item.unit || item.customUnit || item.material?.unit || "—",
+          })),
+        }))
+      );
       setTotalCount(count);
     } catch (err) {
       console.error("Failed to fetch material requests:", err);

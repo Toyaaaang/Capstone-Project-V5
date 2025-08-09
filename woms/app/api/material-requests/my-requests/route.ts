@@ -15,7 +15,9 @@ export async function GET(req: NextRequest) {
   const [results, count] = await Promise.all([
     prisma.materialRequest.findMany({
       where: { requesterId: user.id },
-      include: { items: true },
+      include: {
+        items: { include: { material: true } } 
+      },
       orderBy: [{ createdAt: "desc" }],
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,

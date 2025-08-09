@@ -13,17 +13,29 @@ declare module "next-auth" {
       name?: string | null;
       image?: string | null;
       role?: string;
+      firstName?: string;
+      lastName?: string;
+      department?: string | null;
+      suboffice?: string | null;
     };
   }
 
   interface User {
     id: string;
     role?: string;
+    firstName?: string;
+    lastName?: string;
+    department?: string | null;
+    suboffice?: string | null;
   }
 
   interface JWT {
     id?: string;
     role?: string;
+    firstName?: string;
+    lastName?: string;
+    department?: string | null;
+    suboffice?: string | null;
   }
 }
 
@@ -61,6 +73,10 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           role: user.role,
           name: `${user.firstName} ${user.lastName}`,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          department: user.department,
+          suboffice: user.suboffice,
         };
       },
     }),
@@ -76,6 +92,10 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.firstName = user.firstName;
+        token.lastName = user.lastName;
+        token.department = user.department;
+        token.suboffice = user.suboffice;
       }
       return token;
     },
@@ -83,6 +103,10 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
+        session.user.firstName = token.firstName as string;
+        session.user.lastName = token.lastName as string;
+        session.user.department = token.department as string | null;
+        session.user.suboffice = token.suboffice as string | null;
       }
       return session;
     },

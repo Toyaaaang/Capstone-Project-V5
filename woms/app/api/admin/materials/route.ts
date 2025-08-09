@@ -18,15 +18,26 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const page = parseInt(searchParams.get("page") || "1");
   const pageSize = parseInt(searchParams.get("page_size") || "10");
+  const search = searchParams.get("search")?.trim() || "";
+  const category = searchParams.get("category")?.trim() || "";
   const skip = (page - 1) * pageSize;
+
+  const where: any = {};
+  if (search) {
+    where.name = { contains: search, mode: "insensitive" };
+  }
+  if (category) {
+    where.category = category;
+  }
 
   const [materials, count] = await Promise.all([
     prisma.material.findMany({
+      where,
       orderBy: { name: "asc" },
       skip,
       take: pageSize,
     }),
-    prisma.material.count(),
+    prisma.material.count({ where }),
   ]);
 
   return NextResponse.json({

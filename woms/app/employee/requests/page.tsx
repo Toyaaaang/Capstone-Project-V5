@@ -1,4 +1,4 @@
-import RequestForm from "@/components/forms/request-form";
+import RequestForm from "@/components/forms/request/request-form";
 
 export default function NewMaterialRequestPage() {
   return (

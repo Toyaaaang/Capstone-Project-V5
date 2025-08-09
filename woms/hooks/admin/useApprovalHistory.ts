@@ -12,17 +12,21 @@ type ApprovalHistory = {
   idImageUrl?: string;
 };
 
-export function useRoleHistory() {
+export function useRoleHistory({ search }: { search: string }) {
   const [data, setData] = useState<ApprovalHistory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
-  const fetchRoleHistory = async (pageNumber = 1) => {
+  const fetchRoleHistory = async (pageNumber = 1, searchValue = "") => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/role-history?page=${pageNumber}`);
+      const res = await fetch(
+        `/api/admin/role-history?page=${pageNumber}&search=${encodeURIComponent(
+          searchValue
+        )}`
+      );
       const json = await res.json();
 
       const rawData = Array.isArray(json) ? json : json.data ?? [];
@@ -48,8 +52,8 @@ export function useRoleHistory() {
   };
 
   useEffect(() => {
-    fetchRoleHistory(page);
-  }, [page]);
+    fetchRoleHistory(page, search);
+  }, [page, search]);
 
   return {
     data,
@@ -58,6 +62,6 @@ export function useRoleHistory() {
     page,
     setPage,
     totalCount,
-    refreshData: () => fetchRoleHistory(page),
+    refreshData: () => fetchRoleHistory(page, search),
   };
 }

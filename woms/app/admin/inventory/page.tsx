@@ -59,7 +59,11 @@ export default function AdminInventoryPage() {
 
   const handleChange = (id: number, field: string, value: any) => {
     setLocalInventory((inv) =>
-      inv.map((i) => (i.id === id ? { ...i, [field]: value } : i))
+      inv.map((i) =>
+        i.id === id
+          ? { ...i, [field]: field === "quantity" ? String(value) : value }
+          : i
+      )
     );
   };
 
@@ -134,6 +138,7 @@ export default function AdminInventoryPage() {
               onSearchChange={setSearch}
             />
           }
+          getRowId={(row) => String(row.id)}
         />
       )}
     </div>

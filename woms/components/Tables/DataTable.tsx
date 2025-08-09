@@ -33,6 +33,7 @@ interface DataTableProps<TData> {
   pageSize?: number;
   /** Optional: Pass a custom filter component to render above the table */
   filters?: React.ReactNode;
+  getRowId?: (row: TData) => string;
 }
 
 export default function DataTable<TData>({
@@ -45,6 +46,7 @@ export default function DataTable<TData>({
   totalCount,
   pageSize = 10,
   filters,
+  getRowId,
 }: DataTableProps<TData>) {
   const totalPages = Math.ceil(totalCount / pageSize);
 
@@ -70,6 +72,7 @@ export default function DataTable<TData>({
       }
     },
     getCoreRowModel: getCoreRowModel(),
+    ...(getRowId && { getRowId }),
     meta: {
       refreshData,
     },

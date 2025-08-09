@@ -8,6 +8,7 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
+import React from "react";
 
 export function getInventoryColumns({ onEdit, editingId, onChange, onSave, onCancel, materials }: any): ColumnDef<any>[] {
   return [
@@ -42,7 +43,7 @@ export function getInventoryColumns({ onEdit, editingId, onChange, onSave, onCan
         editingId === row.original.id ? (
           <Input
             type="number"
-            value={row.original.quantity}
+            value={row.original.quantity ?? ""}
             onChange={e => onChange(row.original.id, "quantity", e.target.value)}
           />
         ) : (
@@ -60,15 +61,41 @@ export function getInventoryColumns({ onEdit, editingId, onChange, onSave, onCan
     {
       id: "actions",
       header: "Actions",
-      cell: ({ row }) =>
-        editingId === row.original.id ? (
+      cell: ({ row }) => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [saving, setSaving] = React.useState(false);
+
+        const handleSave = async () => {
+          setSaving(true);
+          await onSave(row.original.id);
+          setSaving(false);
+        };
+
+        return editingId === row.original.id ? (
           <>
-            <Button size="sm" onClick={() => onSave(row.original.id)}>Save</Button>
-            <Button size="sm" variant="outline" onClick={onCancel} className="ml-2">Cancel</Button>
+            <Button
+              size="sm"
+              onClick={handleSave}
+              disabled={saving}
+            >
+              {saving ? "Saving..." : "Save"}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onCancel}
+              className="ml-2"
+              disabled={saving}
+            >
+              Cancel
+            </Button>
           </>
         ) : (
-          <Button size="sm" onClick={() => onEdit(row.original.id)}>Edit</Button>
-        ),
+          <Button size="sm" onClick={() => onEdit(row.original.id)}>
+            Edit
+          </Button>
+        );
+      },
     },
   ];
 }

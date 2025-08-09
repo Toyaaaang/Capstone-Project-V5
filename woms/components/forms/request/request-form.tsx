@@ -20,14 +20,14 @@ import FormLoader from "@/components/Loaders/FormLoader";
 import { Combobox } from "@/components/ui/combobox"; 
 
 type Material = {
-  id: number;
+  id: string; 
   name: string;
   unit: string;
 };
 
 type Item = {
   is_custom: boolean;
-  material_id?: number;
+  material_id?: string; // should be string, not number
   custom_name?: string;
   custom_unit?: string;
   quantity: number;
@@ -51,7 +51,7 @@ export default function RequestForm({ children }: RequestFormProps) {
 
   // Engineering/Op fields
   const [manpower, setManpower] = useState("");
-  const [targetCompletion, setTargetCompletion] = useState("");
+  const [targetDate, setTargetDate] = useState("");
   const [duration, setDuration] = useState("");
 
   // Finance fields
@@ -66,13 +66,19 @@ export default function RequestForm({ children }: RequestFormProps) {
   const [requestDept, setRequestDept] = useState(""); // For dropdown selection
   const [subofficeEDOMD, setSubofficeEDOMD] = useState(""); // For suboffice: "engineering" or "operations_maintenance"
 
-  // Fetch user info on mount
+  // Fetch user session on mount
   useEffect(() => {
-    fetch("/authentication/me/")
+    fetch("/api/auth/session")
       .then((res) => res.json())
-      .then((data) => {
-        setUserInfo(data);
-        setDepartment(data.department);
+      .then((session) => {
+        if (session?.user) {
+          setUserInfo({
+            role: session.user.role,
+            department: session.user.department,
+            suboffice: session.user.suboffice,
+          });
+          setDepartment(session.user.department);
+        }
       });
   }, []);
 
@@ -101,7 +107,7 @@ export default function RequestForm({ children }: RequestFormProps) {
   // Auto-populate materials based on department
   useEffect(() => {
     if (effectiveDept) {
-      fetch(`/inventory-by-department/?department=${effectiveDept}`)
+      fetch(`/api/inventory/by-department/?department=${effectiveDept}`)
         .then((res) => res.json())
         .then((data) => {
           setMaterials(
@@ -109,7 +115,7 @@ export default function RequestForm({ children }: RequestFormProps) {
               typeof inv.material === "object"
                 ? inv.material
                 : {
-                    id: inv.material,
+                    id: String(inv.material), 
                     name: inv.material_name,
                     unit: inv.unit,
                   }
@@ -173,16 +179,21 @@ export default function RequestForm({ children }: RequestFormProps) {
       longitude: coordinates?.lng,
     };
 
+    // Add these fields if present
+    if (requesterDept) payload.requester_department = requesterDept;
+    if (targetDate) payload.targetCompletion = formatDate(targetDate);
+    if (manpower) payload.manpower_requirements = manpower;
+
     if (department === "finance") {
       payload.requester_department = requesterDept;
     } else {
       payload.manpower = manpower;
-      payload.target_completion = formatDate(targetCompletion);
+      payload.target_completion = formatDate(targetDate);
       payload.duration = duration;
     }
 
     try {
-      const res = await fetch("requests/material-requests/", {
+      const res = await fetch("/api/material-requests/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -195,7 +206,7 @@ export default function RequestForm({ children }: RequestFormProps) {
       setItems([]);
       setPurpose("");
       setManpower("");
-      setTargetCompletion("");
+      setTargetDate("");
       setDuration("");
       setRequesterDept("");
       setRequestDept("");         // <-- clear department dropdown
@@ -274,12 +285,12 @@ export default function RequestForm({ children }: RequestFormProps) {
               values={{
                 purpose,
                 manpower,
-                target_completion: targetCompletion,
+                target_completion: targetDate,
               }}
               onChange={(field, value) => {
                 if (field === "purpose") setPurpose(value);
                 if (field === "manpower") setManpower(value);
-                if (field === "target_completion") setTargetCompletion(value);
+                if (field === "target_completion") setTargetDate(value);
               }}
             />
           ) : (
@@ -336,7 +347,7 @@ export default function RequestForm({ children }: RequestFormProps) {
                     <Combobox
                       options={[
                         ...materials.map((mat) => ({
-                          value: mat.id.toString(),
+                          value: mat.id, // id is string
                           label: `${mat.name} (${mat.unit})`,
                         })),
                         { value: "custom", label: "➕ Add Custom Material" },
@@ -345,7 +356,7 @@ export default function RequestForm({ children }: RequestFormProps) {
                         item.is_custom
                           ? "custom"
                           : item.material_id !== undefined
-                          ? item.material_id.toString()
+                          ? item.material_id
                           : ""
                       }
                       onChange={(val) => {
@@ -356,10 +367,10 @@ export default function RequestForm({ children }: RequestFormProps) {
                           updateItem(i, "custom_name", "");
                           updateItem(i, "custom_unit", "");
                         } else {
-                          const mat = materials.find((m) => m.id === Number(val));
+                          const mat = materials.find((m) => m.id === val);
                           if (mat) {
                             updateItem(i, "is_custom", false);
-                            updateItem(i, "material_id", Number(val));
+                            updateItem(i, "material_id", val);
                             updateItem(i, "unit", mat.unit);
                             updateItem(i, "custom_name", undefined);
                             updateItem(i, "custom_unit", undefined);
@@ -372,7 +383,11 @@ export default function RequestForm({ children }: RequestFormProps) {
                     />
                     <Input
                       placeholder="Unit"
-                      value={item.is_custom ? item.custom_unit || "" : materials.find((m) => m.id === item.material_id)?.unit || ""}
+                      value={
+                        item.is_custom
+                          ? item.custom_unit || ""
+                          : materials.find((m) => m.id === item.material_id)?.unit || ""
+                      }
                       disabled={!item.is_custom}
                       className="w-32 ml-6"
                     />
@@ -452,7 +467,7 @@ function LocationInput({
     if (!value) return;
     setLoading(true);
     try {
-      const res = await fetch(`/requests/geocode/?q=${encodeURIComponent(value)}`);
+      const res = await fetch(`/api/locationiq-geocode/?q=${encodeURIComponent(value)}`);
       const data = await res.json();
       if (data?.length > 0) {
         const best = data[0];

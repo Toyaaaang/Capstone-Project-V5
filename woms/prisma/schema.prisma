@@ -81,6 +81,8 @@ model User {
   auditLogs       AuditLog[]
   
   @@map("users")
+  materialRequests MaterialRequest[]
+  workOrderAssignedRequests MaterialRequest[] @relation("WorkOrderAssignedBy")
 }
 
 model RoleRequestRecord {
@@ -160,6 +162,8 @@ model Material {
   description String?
   visible     Boolean  @default(true)
   inventory   Inventory[]
+
+  MaterialRequestItem MaterialRequestItem[]
 }
 
 model Inventory {
@@ -182,4 +186,64 @@ enum MaterialCategory {
   tools
   office_supply
   uncategorized
+}
+
+model MaterialRequest {
+  id                   String   @id @default(cuid())
+  referenceCode        String   @unique
+  requester            User     @relation(fields: [requesterId], references: [id])
+  requesterId          String
+  department           Department
+  purpose              String
+  createdAt            DateTime @default(now())
+  status               MaterialRequestStatus @default(pending)
+  rejectionReason      String?
+  workOrderNo          String?
+  manpower             String?
+  targetCompletion     DateTime?
+  actualCompletion     DateTime?
+  duration             String?
+  location             String?
+  latitude             Float?
+  longitude            Float?
+  requesterDepartment  String?
+  workOrderAssignedBy  User?    @relation("WorkOrderAssignedBy", fields: [workOrderAssignedById], references: [id])
+  workOrderAssignedById String?
+  origin               RequestOrigin @default(employee)
+  items                MaterialRequestItem[]
+
+  @@map("material_requests")
+}
+
+model MaterialRequestItem {
+  id           String          @id @default(cuid())
+  request      MaterialRequest @relation(fields: [requestId], references: [id])
+  requestId    String
+  material     Material?       @relation(fields: [materialId], references: [id])
+  materialId   String?
+  customName   String?
+  customUnit   String?
+  quantity     Decimal
+  unit         String
+
+  @@map("material_request_items")
+}
+
+enum MaterialRequestStatus {
+  pending
+  won_assigned
+  in_progress
+  completed
+  charged
+  ready_for_release
+  released
+  requisitioned
+  partially_fulfilled
+  invalid
+  rejected
+}
+
+enum RequestOrigin {
+  employee
+  sub_office
 }

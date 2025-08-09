@@ -34,7 +34,7 @@ export default function UnauthorizedPage() {
         <Button
           variant="outline"
           className="mt-2 w-full"
-          onClick={() => router.push("/login")}
+          onClick={() => router.push("/auth/login")}
         >
           <ArrowLeft className="mr-2" />
           Back to Login
